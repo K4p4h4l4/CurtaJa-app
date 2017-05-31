@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+    TODO: Before you run your application, you need a Google Maps API key.
+
+    To get one, follow this link, follow the directions and press "Create" at the end:
+
+    https://console.developers.google.com/flows/enableapi?apiid=maps_android_backend&keyType=CLIENT_SIDE_ANDROID&r=F3:51:56:25:57:FB:52:40:6C:6F:DB:EE:B2:1B:6A:FA:0B:7E:4A:4B%3Bcom.example.tolavio.map
+
+    You can also add your credentials to an existing key, using this line:
+    F3:51:56:25:57:FB:52:40:6C:6F:DB:EE:B2:1B:6A:FA:0B:7E:4A:4B;com.example.tolavio.map
+
+    Alternatively, follow the directions here:
+    https://developers.google.com/maps/documentation/android/start#get-key
+
+    Once you have your key (it starts with "AIza"), replace the "google_maps_key"
+    string in this file.
+    -->
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">
+        AIzaSyChfrbtdaFLR6q56VCf2qM5-Jyf3CwLXyk
+    </string>
+</resources>

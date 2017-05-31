@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Curta Já</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="action_settings">Configurações</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="action_add_eventos"> Adicionar Evento</string>
+    <string name="action_comprar">Comprar ingresso</string>
+    <string name="title_activity_teste">teste</string>
+    <string name="backdrop_subtitle">Os melhores eventos para você</string>
+    <string name="title_activity_launch">launch</string>
+</resources>

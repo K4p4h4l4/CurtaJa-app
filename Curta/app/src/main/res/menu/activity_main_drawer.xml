@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    >
+
+    <group android:checkableBehavior="single"
+        android:background="@color/black"
+        >
+        <item
+            android:id="@+id/nav_login"
+            android:icon="@drawable/ic_account_circle_black_24dp"
+            android:title="Log in"
+            />
+        <item
+            android:id="@+id/nav_meus_eventos"
+            android:icon="@drawable/ic_event_black_24dp"
+            android:title="Meus eventos"/>
+        <item
+            android:id="@+id/nav_bares"
+            android:icon="@drawable/ic_event_black_24dp"
+            android:title="Bares"/>
+        <item
+            android:id="@+id/nav_festas"
+            android:icon="@drawable/ic_event_black_24dp"
+            android:title="Eventos"/>
+
+
+        <!--<item
+            android:id="@+id/nav_camera"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="Import" />
+        <item
+            android:id="@+id/nav_gallery"
+            android:icon="@drawable/ic_menu_gallery"
+            android:title="Gallery" />
+        <item
+            android:id="@+id/nav_slideshow"
+            android:icon="@drawable/ic_menu_slideshow"
+            android:title="Slideshow" />
+        <item
+            android:id="@+id/nav_manage"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="Tools" />-->
+        <item
+            android:id="@+id/nav_about"
+            android:icon="@drawable/ic_description_black_24dp"
+            android:title="Sobre nós"/>
+    </group>
+
+    <item android:title="Comunicação">
+        <menu>
+            <item
+                android:id="@+id/nav_fale_connosco"
+                android:icon="@drawable/ic_menu_send"
+                android:title="Fale connosco" />
+        </menu>
+    </item>
+
+</menu>

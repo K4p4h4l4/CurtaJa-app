@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="200dp">
+
+        <ViewFlipper
+            android:id="@+id/bares_viewFlipper"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/imgVBares1"
+                android:layout_width="match_parent"
+                android:layout_height="220dp"
+                android:src="@drawable/slide21"
+                android:scaleType="centerCrop" />
+
+            <ImageView
+                android:id="@+id/imgVBares2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/slide22"
+                android:scaleType="centerCrop"/>
+        </ViewFlipper>
+    </LinearLayout>
+
+</LinearLayout>

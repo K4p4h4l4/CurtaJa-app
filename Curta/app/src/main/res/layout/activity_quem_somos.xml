@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    android:background="@mipmap/bg"
+    tools:context="com.example.tolavio.curta.QuemSomos">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        >
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Seja Bem-vindo"
+            android:textColor="@color/white"
+            android:paddingLeft="20dp"
+            android:paddingTop="30dp"
+            android:textSize="30dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Quem Somos"
+            android:textColor="@color/white"
+            android:paddingLeft="20dp"
+            android:paddingTop="20dp"
+            android:textSize="18dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="O CurtaJa é uma empresa formada por uma equipe coesa de Engenheiros, Desenvolvidores Web, Desenvolvidores de Aplicativos, Designer Gráficos e consultores em Gestão da Informação que conseguem absorver de forma racional as necessidades do mercado e transformá-las em ofertas personalizadas e segmentadas de acordo com a necessidade dos seus clientes, agregando simplicidade e valor aos seus produtos e serviços de gestão da informação. Nosso indicador de satisfação é a segurança dos nossos clientes ao contratarem nossos serviços, pois atuamos sobre uma base consistente de valores, buscando relações estáveis de parceria e que beneficiem a todos os envolvidos. E colocamos todo nosso conhecimento em benefício dos nossos clientes, garantindo projetos bem sucedidos, de alto valor agregado e em excelente relação custo-benefícios.. "
+            android:textColor="@color/white"
+            android:paddingLeft="20dp"
+            android:paddingTop="10dp"
+            android:textSize="15dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Missão"
+            android:textColor="@color/white"
+            android:paddingLeft="20dp"
+            android:paddingTop="20dp"
+            android:textSize="18dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="A missão da empresa CurtaJa (Curta Já) é fornecer soluções de consultoria em Marketing Digital, Desenvolvimento de Aplicativos, Desenvolvimento de Artes (banners, layous, logo-marcas) para Empresas, Bares, Discotecas, Organizadores de Eventos, facilitadade de busca e divulgação de sua marca ou do seu estabelecimento, por meio de um aplicativo e um site. Nossos principais clientes são os proprietários de Discotecas, Bares, Organizadores de Eventos, Bandas e Djs. Fundada em 2015 pelo Senhor Hermane de Boavida, na cidade de Santa Rita do Sapucaí, atualmente contamos com 3 colaboraderes.. "
+            android:textColor="@color/white"
+            android:paddingLeft="20dp"
+            android:paddingTop="10dp"
+            android:textSize="15dp" />
+    </LinearLayout>
+
+
+</ScrollView>
