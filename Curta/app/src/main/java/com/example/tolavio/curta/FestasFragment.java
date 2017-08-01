@@ -33,6 +33,8 @@ import android.widget.Toast;
 
 import com.example.tolavio.curta.models.BaresModel;
 import com.example.tolavio.curta.models.FestasModel;
+import com.firebase.ui.auth.AuthUI;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.gson.Gson;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
@@ -52,6 +54,9 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -62,10 +67,13 @@ public class FestasFragment extends Fragment implements AdapterView.OnItemClickL
     public RecyclerView recyclerView;
     private static int prim_vez = 0;
     ConnectionDetector cd;
+    private static int SIGN_IN_REQUEST_CODE = 1;
 
     View gView;
 
-
+    private ApiFestasInterface apiFestasInterface;
+    private List<FestasModel> festas;
+    FestasAdapter festasAdapter;
     private ProgressDialog progressDialog;
 
 
@@ -97,19 +105,44 @@ public class FestasFragment extends Fragment implements AdapterView.OnItemClickL
             recyclerView.setItemAnimator(new DefaultItemAnimator());
 
 
-            new FestasJSONTask().execute("https://www.curtaja.com/api/v1/eventos/search");
+            apiFestasInterface = ApiFestasClient.getApiClient().create(ApiFestasInterface.class);
+
+            Call<List<FestasModel>> call = apiFestasInterface.getFestasModel();
+
+            call.enqueue(new Callback<List<FestasModel>>() {
+                @Override
+                public void onResponse(Call<List<FestasModel>> call, retrofit2.Response<List<FestasModel>> response) {
+                    festas = response.body();
+                    /*List<BaresModel> baresLocal = null;
+                    for (int i = 0; i < bares.size(); i++) {
+                        if(bares.get(i).getStatus() == 1){
+
+                            baresLocal.add(bares.get(i));
+
+                        }
+                    }*/
+                    festasAdapter = new FestasFragment.FestasAdapter(getContext(), festas);
+                    retornaListaFestas = new RetornaListaFestas(festas);
+                    festasAdapter.notifyDataSetChanged();
+                    recyclerView.setAdapter(festasAdapter);
+                }
+
+                @Override
+                public void onFailure(Call<List<FestasModel>> call, Throwable t) {
+
+                }
+            });
+
 
             recyclerView.addOnItemTouchListener(new FestasFragment.FestasAdapter.RecyclerTouchListener(getContext(), recyclerView, new FestasFragment.FestasAdapter.ClickListener() {
                 @Override
                 public void onClick(View view, int position) {
 
-                    if (prim_vez == 0) {
+                    if(FirebaseAuth.getInstance().getCurrentUser()==null){
 
-                        Intent i = new Intent(getActivity(), CadastrarActivity.class);
-                        prim_vez = 1;
-                        startActivity(i);
-                    } else if (prim_vez == 1) {
+                        startActivityForResult(AuthUI.getInstance().createSignInIntentBuilder().build(),SIGN_IN_REQUEST_CODE);
 
+                    }else {
 
                         List<FestasModel> festasList = retornaListaFestas.RetornaListaFestas();
 
@@ -124,7 +157,6 @@ public class FestasFragment extends Fragment implements AdapterView.OnItemClickL
 
                         startActivity(i);
                     }
-
                 }
 
                 @Override
@@ -374,111 +406,4 @@ public class FestasFragment extends Fragment implements AdapterView.OnItemClickL
         }
     }
 
-    public class FestasJSONTask extends AsyncTask<String, String, List<FestasModel>> {
-
-        List<FestasModel> festasModelsList;
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            progressDialog.show();
-        }
-
-        @Override
-        protected List<FestasModel> doInBackground(String... params) {
-
-            String colummn = "categorias_id";
-            String operator = "=";
-            int search = 4;
-            String searchString = Integer.toString(search);
-            HttpURLConnection httpURLConnection = null;
-            BufferedReader bufferedReader = null;
-            try {
-                URL url = new URL(params[0]);
-                httpURLConnection = (HttpURLConnection) url.openConnection();
-                httpURLConnection.setRequestMethod("POST");
-                httpURLConnection.setDoOutput(true);
-                OutputStream OS = httpURLConnection.getOutputStream();
-                BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(OS, "UTF-8"));
-                String data = URLEncoder.encode("column", "UTF-8") + "=" + URLEncoder.encode(colummn, "UTF-8") + "&" +
-                        URLEncoder.encode("operator", "UTF-8") + "=" + URLEncoder.encode(operator, "UTF-8") + "&" +
-                        URLEncoder.encode("search", "UTF-8") + "=" + URLEncoder.encode(searchString, "UTF-8");
-                bufferedWriter.write(data);
-                bufferedWriter.flush();
-                bufferedWriter.close();
-                OS.close();
-
-                httpURLConnection.connect();
-
-                InputStream inputStream = httpURLConnection.getInputStream();
-
-                bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-                StringBuffer stringBuffer = new StringBuffer();
-                String linha = "";
-
-                while ((linha = bufferedReader.readLine()) != null) {
-
-                    stringBuffer.append(linha);
-                }
-                String finalJson = stringBuffer.toString();
-                // JSONObject jsonObject = new JSONObject(finalJson);
-                //JSONArray jsonArray = jsonObject.getJSONArray("");
-
-                festasModelsList = new ArrayList<>();
-
-                //  Gson gson = new Gson();
-
-                //  for(int i = 0; i<jsonArray.length();i++){
-
-                //  JSONObject finalObject = jsonArray.getJSONObject(i);
-                FestasModel[] festasModel = new Gson().fromJson(finalJson, FestasModel[].class);
-                //baresModel.setId(finalObject.getInt("id"));
-                    /*baresModel.setDescricao(finalObject.getString("descricao"));
-                    baresModel.setImagem(finalObject.getString("imagem"));
-                    baresModel.setObservacao(finalObject.getString("observacao"));*/
-
-                //adicionando o objeto final na lista
-                //   baresModelsList.add(baresModel);
-
-//                }
-
-
-                for (int i = 0; i < festasModel.length; i++) {
-                    if(festasModel[i].getStatus() == 1){
-                        festasModelsList.add(festasModel[i]);
-
-                    }
-                }
-                return festasModelsList;
-
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                if (httpURLConnection != null) {
-                    httpURLConnection.disconnect();
-                }
-                try {
-                    if (bufferedReader != null) {
-                        bufferedReader.close();
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(List<FestasModel> result) {
-            super.onPostExecute(result);
-            progressDialog.dismiss();
-            FestasFragment.FestasAdapter festasAdapter = new FestasFragment.FestasAdapter(getContext(), result);
-            retornaListaFestas = new RetornaListaFestas(result);
-            festasAdapter.notifyDataSetChanged();
-            recyclerView.setAdapter(festasAdapter);
-        }
-
-    }
 }

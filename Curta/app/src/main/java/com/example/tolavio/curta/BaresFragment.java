@@ -32,6 +32,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonRequest;
 import com.example.tolavio.curta.models.BaresModel;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.database.FirebaseListAdapter;
@@ -40,9 +45,14 @@ import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.auth.api.Auth;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -51,12 +61,20 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Retrofit;
+import retrofit2.http.GET;
+import retrofit2.http.POST;
 
 import static android.app.Activity.RESULT_OK;
 import static android.content.ContentValues.TAG;
@@ -80,6 +98,9 @@ public class BaresFragment extends Fragment implements AdapterView.OnItemClickLi
     View gView;
     ConnectionDetector cd;
 
+    private ApiBaresInterface apiBaresInterface;
+    private List<BaresModel> bares;
+    BaresAdapter baresAdapter;
 
     private ProgressDialog progressDialog;
 
@@ -127,27 +148,53 @@ public class BaresFragment extends Fragment implements AdapterView.OnItemClickLi
             recyclerView.addItemDecoration(new GridSpacingItemDecoration(2, dpToPx(10), true));
             recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-            new JSONTask().execute("https://www.curtaja.com/api/v1/eventos/search");
+
+
+            apiBaresInterface = ApiBaresClient.getApiClient().create(ApiBaresInterface.class);
+
+            Call<List<BaresModel>> call = apiBaresInterface.getBaresModel();
+
+            call.enqueue(new Callback<List<BaresModel>>() {
+                @Override
+                public void onResponse(Call<List<BaresModel>> call, retrofit2.Response<List<BaresModel>> response) {
+                    bares = response.body();
+                    baresAdapter = new BaresAdapter(getContext(), bares);
+                    retornaListaBares = new RetornaListaBares(bares);
+                    baresAdapter.notifyDataSetChanged();
+                    recyclerView.setAdapter(baresAdapter);
+                }
+
+                @Override
+                public void onFailure(Call<List<BaresModel>> call, Throwable t) {
+
+                }
+            });
 
 
             recyclerView.addOnItemTouchListener(new BaresAdapter.RecyclerTouchListener(getContext(), recyclerView, new BaresAdapter.ClickListener() {
                 @Override
                 public void onClick(View view, int position) {
 
-                    List<BaresModel> baresList = retornaListaBares.RetornaListaBares();
+                    if(FirebaseAuth.getInstance().getCurrentUser()==null){
 
-                    Intent i = new Intent(getActivity(), BaresDetalhes.class);
-                    i.putExtra(BaresDetalhes.EXTRA_IMAGE, baresList.get(position).getBanner());
-                    i.putExtra(BaresDetalhes.EXTRA_NOME, baresList.get(position).getNome());
-                    i.putExtra(BaresDetalhes.EXTRA_LOCAL, baresList.get(position).getEndereco());
-                    i.putExtra(BaresDetalhes.EXTRA_OBS, baresList.get(position).getObservacao());
-                    i.putExtra(BaresDetalhes.EXTRA_DETALHES, baresList.get(position).getDescricao());
-                    i.putExtra(BaresDetalhes.EXTRA_DATA, baresList.get(position).getDataHora());
-                    i.putExtra(BaresDetalhes.EXTRA_CIDADE, baresList.get(position).getCidade());
-                    i.putExtra(BaresDetalhes.EXTRA_NUMERO, baresList.get(position).getNumero());
+                        startActivityForResult(AuthUI.getInstance().createSignInIntentBuilder().build(),SIGN_IN_REQUEST_CODE);
 
-                    startActivity(i);
+                    }else {
 
+                        List<BaresModel> baresList = retornaListaBares.RetornaListaBares();
+
+                        Intent i = new Intent(getActivity(), BaresDetalhes.class);
+                        i.putExtra(BaresDetalhes.EXTRA_IMAGE, baresList.get(position).getBanner());
+                        i.putExtra(BaresDetalhes.EXTRA_NOME, baresList.get(position).getNome());
+                        i.putExtra(BaresDetalhes.EXTRA_LOCAL, baresList.get(position).getEndereco());
+                        i.putExtra(BaresDetalhes.EXTRA_OBS, baresList.get(position).getObservacao());
+                        i.putExtra(BaresDetalhes.EXTRA_DETALHES, baresList.get(position).getDescricao());
+                        i.putExtra(BaresDetalhes.EXTRA_DATA, baresList.get(position).getDataHora());
+                        i.putExtra(BaresDetalhes.EXTRA_CIDADE, baresList.get(position).getCidade());
+                        i.putExtra(BaresDetalhes.EXTRA_NUMERO, baresList.get(position).getNumero());
+
+                        startActivity(i);
+                    }
 
                 }
 
@@ -400,112 +447,5 @@ public class BaresFragment extends Fragment implements AdapterView.OnItemClickLi
         }
     }
 
-    public class JSONTask extends AsyncTask<String, String, List<BaresModel>> {
-
-        List<BaresModel> baresModelsList;
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            progressDialog.show();
-        }
-
-        @Override
-        protected List<BaresModel> doInBackground(String... params) {
-
-            String colummn = "categorias_id";
-            String operator = "=";
-            int search = 5;
-            String searchString = Integer.toString(search);
-            HttpURLConnection httpURLConnection = null;
-            BufferedReader bufferedReader = null;
-            try {
-                URL url = new URL(params[0]);
-                httpURLConnection = (HttpURLConnection) url.openConnection();
-                httpURLConnection.setRequestMethod("POST");
-                httpURLConnection.setDoOutput(true);
-                OutputStream OS = httpURLConnection.getOutputStream();
-                BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(OS, "UTF-8"));
-                String data = URLEncoder.encode("column", "UTF-8") + "=" + URLEncoder.encode(colummn, "UTF-8") + "&" +
-                        URLEncoder.encode("operator", "UTF-8") + "=" + URLEncoder.encode(operator, "UTF-8") + "&" +
-                        URLEncoder.encode("search", "UTF-8") + "=" + URLEncoder.encode(searchString, "UTF-8");
-                bufferedWriter.write(data);
-                bufferedWriter.flush();
-                bufferedWriter.close();
-                OS.close();
-
-                httpURLConnection.connect();
-
-                InputStream inputStream = httpURLConnection.getInputStream();
-
-                bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-                StringBuffer stringBuffer = new StringBuffer();
-                String linha = "";
-
-                while ((linha = bufferedReader.readLine()) != null) {
-
-                    stringBuffer.append(linha);
-                }
-                String finalJson = stringBuffer.toString();
-                // JSONObject jsonObject = new JSONObject(finalJson);
-                //JSONArray jsonArray = jsonObject.getJSONArray("");
-
-                baresModelsList = new ArrayList<>();
-
-                //  Gson gson = new Gson();
-
-                //  for(int i = 0; i<jsonArray.length();i++){
-
-                //  JSONObject finalObject = jsonArray.getJSONObject(i);
-                BaresModel[] baresModel = new Gson().fromJson(finalJson, BaresModel[].class);
-                //baresModel.setId(finalObject.getInt("id"));
-                    /*baresModel.setDescricao(finalObject.getString("descricao"));
-                    baresModel.setImagem(finalObject.getString("imagem"));
-                    baresModel.setObservacao(finalObject.getString("observacao"));*/
-
-                //adicionando o objeto final na lista
-                //   baresModelsList.add(baresModel);
-
-//                }
-
-
-                for (int i = 0; i < baresModel.length; i++) {
-                    if(baresModel[i].getStatus() == 1){
-                        baresModelsList.add(baresModel[i]);
-
-                    }
-                }
-                return baresModelsList;
-
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                if (httpURLConnection != null) {
-                    httpURLConnection.disconnect();
-                }
-                try {
-                    if (bufferedReader != null) {
-                        bufferedReader.close();
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(List<BaresModel> result) {
-            super.onPostExecute(result);
-            progressDialog.dismiss();
-            BaresAdapter baresAdapter = new BaresAdapter(getContext(), result);
-            retornaListaBares = new RetornaListaBares(result);
-            baresAdapter.notifyDataSetChanged();
-            recyclerView.setAdapter(baresAdapter);
-        }
-
-    }
 }
 

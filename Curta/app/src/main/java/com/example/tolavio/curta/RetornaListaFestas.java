@@ -13,6 +13,7 @@ public class RetornaListaFestas {
     List<FestasModel> festasModels;
 
     public RetornaListaFestas(List<FestasModel> festas){
+
         this.festasModels = festas;
     }
 
